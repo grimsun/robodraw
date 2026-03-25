@@ -1,0 +1,34 @@
+# Python virtual environments
+.venv/
+.venv-vsketch/
+.python-version
+
+# Python caches and build artifacts
+__pycache__/
+*.py[cod]
+*.so
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+build/
+dist/
+
+# Local dependency/tool caches
+.uv-cache/
+.uv-python/
+.mplconfig/
+.cache/
+
+# Editor and OS noise
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Generated plot/output artifacts
+output/
+sketches/**/output/
