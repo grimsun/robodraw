@@ -35,7 +35,24 @@ def parse_args() -> argparse.Namespace:
         default=Path("output/custom/flow_fields.svg"),
         help="Output SVG path.",
     )
-    return parser.parse_args()
+    args = parser.parse_args()
+    validate_args(parser, args)
+    return args
+
+
+def validate_args(parser: argparse.ArgumentParser, args: argparse.Namespace) -> None:
+    if args.width_mm <= 0 or args.height_mm <= 0:
+        parser.error("--width-mm and --height-mm must be positive")
+    if args.margin_mm < 0:
+        parser.error("--margin-mm must be zero or greater")
+    if args.width_mm <= 2 * args.margin_mm or args.height_mm <= 2 * args.margin_mm:
+        parser.error("--margin-mm must leave drawable space inside the page")
+    if args.columns < 1 or args.rows < 1:
+        parser.error("--columns and --rows must be at least 1")
+    if args.steps < 1:
+        parser.error("--steps must be at least 1")
+    if args.step_mm <= 0 or args.noise_scale <= 0:
+        parser.error("--step-mm and --noise-scale must be positive")
 
 
 def clamp(value: float, low: float, high: float) -> float:
