@@ -49,6 +49,7 @@ python3 scripts/generate_art.py \
   --columns 120 \
   --rows 170 \
   --steps 28 \
+  --stroke-width-mm 0.22 \
   --output output/custom/a4_flow.svg
 ```
 

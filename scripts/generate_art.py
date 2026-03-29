@@ -26,6 +26,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--rows", type=int, default=110)
     parser.add_argument("--steps", type=int, default=24)
     parser.add_argument("--step-mm", type=float, default=1.6)
+    parser.add_argument("--stroke-width-mm", type=float, default=0.28)
     parser.add_argument("--noise-scale", type=float, default=0.028)
     parser.add_argument("--swirl", type=float, default=0.95)
     parser.add_argument("--seed", type=int, default=11)
@@ -51,8 +52,10 @@ def validate_args(parser: argparse.ArgumentParser, args: argparse.Namespace) -> 
         parser.error("--columns and --rows must be at least 1")
     if args.steps < 1:
         parser.error("--steps must be at least 1")
-    if args.step_mm <= 0 or args.noise_scale <= 0:
-        parser.error("--step-mm and --noise-scale must be positive")
+    if args.step_mm <= 0 or args.stroke_width_mm <= 0 or args.noise_scale <= 0:
+        parser.error(
+            "--step-mm, --stroke-width-mm, and --noise-scale must be positive"
+        )
 
 
 def clamp(value: float, low: float, high: float) -> float:
@@ -119,13 +122,19 @@ def svg_path(points: list[Point]) -> str:
     return " ".join(commands)
 
 
-def write_svg(paths: list[list[Point]], width: float, height: float, output_path: Path) -> None:
+def write_svg(
+    paths: list[list[Point]],
+    width: float,
+    height: float,
+    stroke_width_mm: float,
+    output_path: Path,
+) -> None:
     output_path.parent.mkdir(parents=True, exist_ok=True)
     path_markup = "\n".join(
         f'    <path d="{svg_path(points)}" />' for points in paths if len(points) > 1
     )
     svg = f"""<svg xmlns="http://www.w3.org/2000/svg" width="{width:.0f}mm" height="{height:.0f}mm" viewBox="0 0 {width:.3f} {height:.3f}">
-  <g fill="none" stroke="#111111" stroke-width="0.28" stroke-linecap="round" stroke-linejoin="round">
+  <g fill="none" stroke="#111111" stroke-width="{stroke_width_mm:.3f}" stroke-linecap="round" stroke-linejoin="round">
 {path_markup}
   </g>
 </svg>
@@ -136,7 +145,9 @@ def write_svg(paths: list[list[Point]], width: float, height: float, output_path
 def main() -> None:
     args = parse_args()
     paths = build_paths(args)
-    write_svg(paths, args.width_mm, args.height_mm, args.output)
+    write_svg(
+        paths, args.width_mm, args.height_mm, args.stroke_width_mm, args.output
+    )
     print(f"Wrote {len(paths)} paths to {args.output}")
 
 
