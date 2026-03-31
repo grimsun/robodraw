@@ -27,6 +27,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--steps", type=int, default=24)
     parser.add_argument("--step-mm", type=float, default=1.6)
     parser.add_argument("--stroke-width-mm", type=float, default=0.28)
+    parser.add_argument("--stroke-color", default="#111111")
     parser.add_argument("--noise-scale", type=float, default=0.028)
     parser.add_argument("--swirl", type=float, default=0.95)
     parser.add_argument("--seed", type=int, default=11)
@@ -56,6 +57,14 @@ def validate_args(parser: argparse.ArgumentParser, args: argparse.Namespace) -> 
         parser.error(
             "--step-mm, --stroke-width-mm, and --noise-scale must be positive"
         )
+    if not is_hex_color(args.stroke_color):
+        parser.error("--stroke-color must be a hex color like #111111 or #222")
+
+
+def is_hex_color(value: str) -> bool:
+    if len(value) not in {4, 7} or not value.startswith("#"):
+        return False
+    return all(char in "0123456789abcdefABCDEF" for char in value[1:])
 
 
 def clamp(value: float, low: float, high: float) -> float:
@@ -127,6 +136,7 @@ def write_svg(
     width: float,
     height: float,
     stroke_width_mm: float,
+    stroke_color: str,
     output_path: Path,
 ) -> None:
     output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -134,7 +144,7 @@ def write_svg(
         f'    <path d="{svg_path(points)}" />' for points in paths if len(points) > 1
     )
     svg = f"""<svg xmlns="http://www.w3.org/2000/svg" width="{width:.0f}mm" height="{height:.0f}mm" viewBox="0 0 {width:.3f} {height:.3f}">
-  <g fill="none" stroke="#111111" stroke-width="{stroke_width_mm:.3f}" stroke-linecap="round" stroke-linejoin="round">
+  <g fill="none" stroke="{stroke_color}" stroke-width="{stroke_width_mm:.3f}" stroke-linecap="round" stroke-linejoin="round">
 {path_markup}
   </g>
 </svg>
@@ -146,7 +156,12 @@ def main() -> None:
     args = parse_args()
     paths = build_paths(args)
     write_svg(
-        paths, args.width_mm, args.height_mm, args.stroke_width_mm, args.output
+        paths,
+        args.width_mm,
+        args.height_mm,
+        args.stroke_width_mm,
+        args.stroke_color,
+        args.output,
     )
     print(f"Wrote {len(paths)} paths to {args.output}")
 

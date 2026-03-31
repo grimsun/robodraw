@@ -50,6 +50,7 @@ python3 scripts/generate_art.py \
   --rows 170 \
   --steps 28 \
   --stroke-width-mm 0.22 \
+  --stroke-color '#222222' \
   --output output/custom/a4_flow.svg
 ```
 
