@@ -29,6 +29,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--stroke-width-mm", type=float, default=0.28)
     parser.add_argument("--stroke-color", default="#111111")
     parser.add_argument("--stroke-opacity", type=float, default=1.0)
+    parser.add_argument("--title", default="")
     parser.add_argument("--noise-scale", type=float, default=0.028)
     parser.add_argument("--swirl", type=float, default=0.95)
     parser.add_argument("--seed", type=int, default=11)
@@ -141,19 +142,29 @@ def write_svg(
     stroke_width_mm: float,
     stroke_color: str,
     stroke_opacity: float,
+    title: str,
     output_path: Path,
 ) -> None:
     output_path.parent.mkdir(parents=True, exist_ok=True)
     path_markup = "\n".join(
         f'    <path d="{svg_path(points)}" />' for points in paths if len(points) > 1
     )
+    title_markup = f"  <title>{escape_xml_text(title)}</title>\n" if title else ""
     svg = f"""<svg xmlns="http://www.w3.org/2000/svg" width="{width:.0f}mm" height="{height:.0f}mm" viewBox="0 0 {width:.3f} {height:.3f}">
-  <g fill="none" stroke="{stroke_color}" stroke-width="{stroke_width_mm:.3f}" stroke-opacity="{stroke_opacity:.3f}" stroke-linecap="round" stroke-linejoin="round">
+{title_markup}  <g fill="none" stroke="{stroke_color}" stroke-width="{stroke_width_mm:.3f}" stroke-opacity="{stroke_opacity:.3f}" stroke-linecap="round" stroke-linejoin="round">
 {path_markup}
   </g>
 </svg>
 """
     output_path.write_text(svg, encoding="utf-8")
+
+
+def escape_xml_text(value: str) -> str:
+    return (
+        value.replace("&", "&amp;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+    )
 
 
 def main() -> None:
@@ -166,6 +177,7 @@ def main() -> None:
         args.stroke_width_mm,
         args.stroke_color,
         args.stroke_opacity,
+        args.title,
         args.output,
     )
     print(f"Wrote {len(paths)} paths to {args.output}")
