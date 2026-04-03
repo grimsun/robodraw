@@ -53,6 +53,7 @@ python3 scripts/generate_art.py \
   --stroke-color '#222222' \
   --stroke-opacity 0.85 \
   --title 'A4 flow field' \
+  --description 'Dense flow field for pen plot testing' \
   --output output/custom/a4_flow.svg
 ```
 
