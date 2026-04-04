@@ -29,6 +29,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--stroke-width-mm", type=float, default=0.28)
     parser.add_argument("--stroke-color", default="#111111")
     parser.add_argument("--stroke-opacity", type=float, default=1.0)
+    parser.add_argument(
+        "--stroke-linecap", choices=("butt", "round", "square"), default="round"
+    )
     parser.add_argument("--title", default="")
     parser.add_argument("--description", default="")
     parser.add_argument("--noise-scale", type=float, default=0.028)
@@ -143,6 +146,7 @@ def write_svg(
     stroke_width_mm: float,
     stroke_color: str,
     stroke_opacity: float,
+    stroke_linecap: str,
     title: str,
     description: str,
     output_path: Path,
@@ -156,7 +160,7 @@ def write_svg(
         f"  <desc>{escape_xml_text(description)}</desc>\n" if description else ""
     )
     svg = f"""<svg xmlns="http://www.w3.org/2000/svg" width="{width:.0f}mm" height="{height:.0f}mm" viewBox="0 0 {width:.3f} {height:.3f}">
-{title_markup}{desc_markup}  <g fill="none" stroke="{stroke_color}" stroke-width="{stroke_width_mm:.3f}" stroke-opacity="{stroke_opacity:.3f}" stroke-linecap="round" stroke-linejoin="round">
+{title_markup}{desc_markup}  <g fill="none" stroke="{stroke_color}" stroke-width="{stroke_width_mm:.3f}" stroke-opacity="{stroke_opacity:.3f}" stroke-linecap="{stroke_linecap}" stroke-linejoin="round">
 {path_markup}
   </g>
 </svg>
@@ -182,6 +186,7 @@ def main() -> None:
         args.stroke_width_mm,
         args.stroke_color,
         args.stroke_opacity,
+        args.stroke_linecap,
         args.title,
         args.description,
         args.output,
